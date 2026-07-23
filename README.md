@@ -264,8 +264,11 @@ static egress IPs, so an IP allowlist will silently fail to connect.
 
 ### Deployment — Vercel
 
-`vercel.json` routes every path to `api/index.js` and bundles `public/**` so the admin panel's
-static files ship with the function.
+`vercel.json` uses an explicit `builds` + `routes` config. That is deliberate: Vercel's zero-config
+detection would otherwise (a) mount a top-level `public/` directory at the site root, shadowing `/`
+and exposing a second unrouted copy of the admin panel, and (b) keep its own handling of `/` even
+after that directory is renamed. The explicit config opts out of both, so every path reaches the one
+Node function. The panel's files live in `web/` — not `public/` — for the same reason.
 
 1. Import the repo at [vercel.com/new](https://vercel.com/new). No build command is needed.
 2. **Settings → Environment Variables**, for Production *and* Preview:
