@@ -223,24 +223,81 @@ and the install will fail with a parse error.
 ## Project structure
 
 ```
-backend/
+godfather-app-store-backend/
+├── api/index.js        serverless entrypoint (Vercel)
+├── vercel.json
+├── public/admin/       the admin panel (HTML + vanilla JS + built Tailwind)
+├── src/admin/admin.css Tailwind source for the panel
 ├── src/
 │   ├── config/         env.js (validated config), db.js (Atlas connection)
-│   ├── models/         Category.js, App.js — Mongoose schemas + JSON transforms
+│   ├── models/         Category.js, App.js, User.js, Session.js
 │   ├── validators/     schemas.js — zod schemas for every body/query/param
 │   ├── middleware/     validate.js, adminAuth.js, errorHandler.js
-│   ├── controllers/    categoryController.js, appController.js
-│   ├── routes/         index.js, categoryRoutes.js, appRoutes.js, adminRoutes.js
+│   ├── controllers/    categoryController.js, appController.js, authController.js
+│   ├── routes/         index.js, categoryRoutes.js, appRoutes.js, adminRoutes.js, authRoutes.js
 │   ├── utils/          drive.js, apiResponse.js, asyncHandler.js, slugify.js
 │   ├── app.js          Express wiring (helmet, cors, compression, rate limit)
-│   └── server.js       Bootstrap + graceful shutdown
-├── scripts/seed.js
+│   └── server.js       entrypoint for persistent hosts
+├── scripts/seed.js, scripts/create-user.js
 └── .env.example
 ```
 
 ---
 
-## Deployment — Render
+## Deployment
+
+The app has **two entrypoints**, and which one runs depends on the host:
+
+| Host | Entrypoint | Why |
+| --- | --- | --- |
+| Local, Render, Railway, Fly | `src/server.js` | Owns the process and calls `app.listen()`. |
+| Vercel and other serverless | `api/index.js` | Exports a handler; serverless never lets anything listen on a port. |
+
+Whichever you use, **set the environment variables on the host first**. `MONGODB_URI` and
+`ADMIN_API_KEY` are required; without them the app answers `503 CONFIG_MISSING` naming exactly what
+is absent, rather than crashing.
+
+And in **Atlas → Network Access, allow `0.0.0.0/0`** — neither Render's free tier nor Vercel has
+static egress IPs, so an IP allowlist will silently fail to connect.
+
+---
+
+### Deployment — Vercel
+
+`vercel.json` routes every path to `api/index.js` and bundles `public/**` so the admin panel's
+static files ship with the function.
+
+1. Import the repo at [vercel.com/new](https://vercel.com/new). No build command is needed.
+2. **Settings → Environment Variables**, for Production *and* Preview:
+
+   | Variable | Value |
+   | --- | --- |
+   | `MONGODB_URI` | your Atlas connection string |
+   | `MONGODB_DB_NAME` | `godfather_app_store` |
+   | `ADMIN_API_KEY` | a long random string |
+   | `BASE_PATH` | `/godfather-app-store` |
+   | `SESSION_TTL_DAYS` | `30` |
+   | `NODE_ENV` | `production` |
+
+   Do **not** set `PORT` — it means nothing to a serverless function.
+3. Redeploy after adding the variables. Vercel does not apply them to an existing build.
+4. Create your admin user by pointing the local script at the same database:
+
+   ```bash
+   MONGODB_URI='<atlas-uri>' npm run create-user -- --email you@example.com --password 'secret'
+   ```
+
+Then `https://<project>.vercel.app/godfather-app-store/admin`.
+
+> **Worth knowing:** serverless suits this workload adequately but not ideally — every cold start
+> re-dials Atlas, and the TV app's launch request can pay a second or two for it. The connection is
+> cached on `globalThis` (see `src/config/db.js`) so warm invocations reuse it, which is what keeps a
+> free-tier cluster from exhausting its connection limit. A small always-on host (Render) avoids the
+> problem entirely.
+
+---
+
+### Deployment — Render
 
 Render is the recommendation here: native Node runtime (no Dockerfile), a free tier that suits a
 personal store, and zero-config deploys from Git.
@@ -252,11 +309,9 @@ personal store, and zero-config deploys from Git.
    - **Build Command:** `npm install`
    - **Start Command:** `npm start`
    - **Health Check Path:** `/api/health`
-4. Add environment variables: `MONGODB_URI`, `MONGODB_DB_NAME`, `ADMIN_API_KEY`, `NODE_ENV=production`.
-   Leave `PORT` unset — Render injects it.
-5. In **Atlas → Network Access**, allow `0.0.0.0/0` (Render's egress IPs are not static on the free
-   tier).
-6. Seed once against production: `MONGODB_URI=… npm run seed` from your machine.
+4. Add environment variables: `MONGODB_URI`, `MONGODB_DB_NAME`, `ADMIN_API_KEY`, `BASE_PATH`,
+   `SESSION_TTL_DAYS`, `NODE_ENV=production`. Leave `PORT` unset — Render injects it.
+5. Seed once against production: `MONGODB_URI=… npm run seed` from your machine.
 
 Then point the TV app at `https://<your-service>.onrender.com`.
 

@@ -1,8 +1,24 @@
+/**
+ * Entrypoint for persistent hosts (local dev, Render, Railway, Fly).
+ *
+ * Serverless platforms use `api/index.js` instead — they invoke an exported
+ * handler and never let a process listen on a port.
+ */
 import { createApp } from './app.js';
 import { env } from './config/env.js';
 import { connectDatabase, disconnectDatabase } from './config/db.js';
 
 async function main() {
+  // env.js collects missing variables rather than throwing, so a serverless
+  // host can report them. On a long-lived server, failing fast is better.
+  if (env.missing.length > 0) {
+    console.error(
+      `[api] missing required environment variable(s): ${env.missing.join(', ')}\n` +
+        '[api] copy .env.example to .env and fill them in.'
+    );
+    process.exit(1);
+  }
+
   await connectDatabase();
 
   const app = createApp();

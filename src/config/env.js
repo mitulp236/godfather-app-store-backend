@@ -2,10 +2,22 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-function required(name, fallback) {
-  const value = process.env[name] ?? fallback;
+/**
+ * Missing configuration is *collected*, not thrown on.
+ *
+ * Throwing here happens at module load. On a serverless host that means the
+ * function dies before it can route anything, and all you get back is an opaque
+ * FUNCTION_INVOCATION_FAILED with no clue which variable is missing. Collecting
+ * instead lets the app boot far enough to answer with a readable 503 saying
+ * exactly what to set — and `server.js` still fails fast locally.
+ */
+const missing = [];
+
+function required(name) {
+  const value = process.env[name];
   if (value === undefined || value === '') {
-    throw new Error(`Missing required environment variable: ${name}`);
+    missing.push(name);
+    return '';
   }
   return value;
 }
@@ -35,4 +47,7 @@ export const env = {
   adminCookiePath: basePath || '/',
 
   sessionTtlDays: Number(process.env.SESSION_TTL_DAYS ?? 30),
+
+  /** Names of required variables that were not supplied. */
+  missing,
 };
