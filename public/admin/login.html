@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#070406" />
+    <title>Sign in · Godfather App Store</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎬</text></svg>" />
+  </head>
+
+  <body class="flex min-h-screen items-center justify-center p-5">
+    <main class="w-full max-w-[26rem] animate-fade-up">
+      <div class="mb-9 text-center">
+        <h1
+          class="bg-gradient-to-b from-white via-white to-blood-300 bg-clip-text font-display text-[3rem] font-black leading-none text-transparent"
+        >
+          Godfather
+        </h1>
+        <p class="mt-2 text-[0.72rem] font-bold uppercase tracking-[0.45em] text-gold-400/80">
+          App Store
+        </p>
+      </div>
+
+      <form id="login-form" class="card p-7 sm:p-8" novalidate>
+        <h2 class="text-[1.35rem] font-extrabold tracking-tight">Admin sign in</h2>
+        <p class="mt-1.5 text-[0.88rem] text-white/40">Manage the catalogue and categories.</p>
+
+        <div class="mt-7">
+          <label class="label" for="email">Email</label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            autocomplete="username"
+            required
+            class="field"
+            placeholder="you@example.com"
+          />
+        </div>
+
+        <div class="mt-5">
+          <label class="label" for="password">Password</label>
+          <div class="relative">
+            <input
+              id="password"
+              name="password"
+              type="password"
+              autocomplete="current-password"
+              required
+              class="field pr-24"
+              placeholder="••••••••"
+            />
+            <button
+              type="button"
+              id="toggle-password"
+              class="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg px-3 py-1.5 text-[0.75rem] font-bold uppercase tracking-wider text-white/40 transition hover:bg-white/5 hover:text-white/80"
+            >
+              Show
+            </button>
+          </div>
+        </div>
+
+        <p
+          id="login-error"
+          class="mt-5 hidden rounded-xl border border-blood-700/50 bg-blood-900/35 px-4 py-3 text-[0.88rem] font-semibold text-blood-200"
+          role="alert"
+        ></p>
+
+        <button type="submit" id="login-submit" class="btn-primary mt-7 w-full py-3">
+          Sign in
+        </button>
+
+        <p class="mt-6 text-center text-[0.78rem] leading-relaxed text-white/25">
+          There is no signup. Add users with
+          <code class="rounded bg-white/5 px-1.5 py-0.5 text-white/40">npm run create-user</code>
+        </p>
+      </form>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>

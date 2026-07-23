@@ -1,0 +1,34 @@
+{
+  "name": "godfather-app-store-backend",
+  "version": "1.1.0",
+  "description": "Backend API + admin panel for the Godfather App Store — serves curated APK metadata to the Android TV / Fire TV client.",
+  "type": "module",
+  "main": "src/server.js",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "seed": "node scripts/seed.js",
+    "seed:fresh": "node scripts/seed.js --fresh",
+    "create-user": "node scripts/create-user.js",
+    "build:css": "tailwindcss -i ./src/admin/admin.css -o ./public/admin/styles.css --minify",
+    "watch:css": "tailwindcss -i ./src/admin/admin.css -o ./public/admin/styles.css --watch"
+  },
+  "dependencies": {
+    "compression": "^1.7.4",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.4.1",
+    "helmet": "^8.0.0",
+    "mongoose": "^8.9.5",
+    "morgan": "^1.10.0",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.17"
+  }
+}
