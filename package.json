@@ -13,8 +13,8 @@
     "seed": "node scripts/seed.js",
     "seed:fresh": "node scripts/seed.js --fresh",
     "create-user": "node scripts/create-user.js",
-    "build:css": "tailwindcss -i ./src/admin/admin.css -o ./public/admin/styles.css --minify",
-    "watch:css": "tailwindcss -i ./src/admin/admin.css -o ./public/admin/styles.css --watch"
+    "build:css": "tailwindcss -i ./src/admin/admin.css -o ./web/admin/styles.css --minify",
+    "watch:css": "tailwindcss -i ./src/admin/admin.css -o ./web/admin/styles.css --watch"
   },
   "dependencies": {
     "compression": "^1.7.4",

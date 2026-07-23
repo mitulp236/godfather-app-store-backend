@@ -55,7 +55,7 @@ A browser UI for managing categories and apps — no curl required.
 
 **http://localhost:4100/godfather-app-store/admin**
 
-Plain HTML + vanilla JavaScript, no framework. The only generated file is `public/admin/styles.css`
+Plain HTML + vanilla JavaScript, no framework. The only generated file is `web/admin/styles.css`
 (Tailwind), which is committed so a deploy never has to build CSS. Rebuild it after editing
 `src/admin/admin.css`:
 
@@ -226,7 +226,7 @@ and the install will fail with a parse error.
 godfather-app-store-backend/
 ├── api/index.js        serverless entrypoint (Vercel)
 ├── vercel.json
-├── public/admin/       the admin panel (HTML + vanilla JS + built Tailwind)
+├── web/admin/         the admin panel (HTML + vanilla JS + built Tailwind)
 ├── src/admin/admin.css Tailwind source for the panel
 ├── src/
 │   ├── config/         env.js (validated config), db.js (Atlas connection)

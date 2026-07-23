@@ -14,7 +14,7 @@ import { apiRoutes } from './routes/index.js';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const adminDir = path.resolve(here, '../public/admin');
+const adminDir = path.resolve(here, '../web/admin');
 
 export function createApp() {
   const app = express();
