@@ -34,6 +34,12 @@ export default async function handler(req, res) {
     );
   }
 
+  // Only the JSON API touches Mongo. The admin panel's HTML/CSS/JS and the
+  // service-info route are static, and should still load when the database is
+  // unreachable — otherwise a connection problem looks like a dead deployment.
+  const path = (req.url || '').split('?')[0];
+  if (!path.startsWith(env.apiPath)) return app(req, res);
+
   try {
     // Resolves instantly once the container is warm.
     await connectDatabase();
