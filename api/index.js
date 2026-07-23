@@ -15,6 +15,29 @@ import { connectDatabase } from '../src/config/db.js';
 const app = createApp();
 
 export default async function handler(req, res) {
+  try {
+    return await route(req, res);
+  } catch (error) {
+    // Anything escaping here would otherwise surface as a bare
+    // FUNCTION_INVOCATION_FAILED with no clue what went wrong.
+    console.error('[handler] unhandled error', error);
+    if (res.headersSent) return undefined;
+    res.statusCode = 500;
+    res.setHeader('content-type', 'application/json');
+    return res.end(
+      JSON.stringify({
+        success: false,
+        error: {
+          code: 'HANDLER_FAILED',
+          message: String((error && error.message) || error),
+          where: req.url,
+        },
+      })
+    );
+  }
+}
+
+async function route(req, res) {
   // Missing configuration must not crash the function — say what is missing.
   if (env.missing.length > 0) {
     res.statusCode = 503;
